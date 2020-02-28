@@ -2,8 +2,9 @@ package com.mak.configuration;
 
 import javax.sql.DataSource;
 
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -16,16 +17,19 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.mak.controller.CustomerController;
+
 @Configuration
 @ComponentScan(basePackages = { "com.mak.controller", "com.mak.service, com.mak.model" })
 @EnableJpaRepositories(basePackages = { "com.mak.dao" })
 @EnableWebSecurity
 public class ConfigurationClass extends WebSecurityConfigurerAdapter {
 
+	private static final Logger logger = LogManager.getLogger(CustomerController.class);
 	@Autowired
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		System.out.println("configure");
+		logger.info("ConfigurationClass");
 		auth.jdbcAuthentication().dataSource(dataSource()).passwordEncoder(passwordEncoder())
 				.usersByUsernameQuery("select user_name, password,enabled from users where user_name=?")
 				.authoritiesByUsernameQuery(
@@ -35,7 +39,7 @@ public class ConfigurationClass extends WebSecurityConfigurerAdapter {
 	@Override
 	public void configure(HttpSecurity http) throws Exception {
 
-		System.out.println("Config");
+		logger.info("configure method");
 		http.authorizeRequests().antMatchers("/showRegistration", "/saveRegistrationForm", "/login").permitAll()
 				.anyRequest().authenticated().and().formLogin().loginPage("/login").defaultSuccessUrl("/admin", true)
 				.permitAll().and().logout().invalidateHttpSession(true).deleteCookies("JSESSIONID").permitAll();

@@ -66,7 +66,7 @@
 			</tr>
 			<tr>
 				<td>Quantity *:</td>
-				<td><div class="form-group"><form:input path="quantity" id="quantity" size="6" class="form-control"
+				<td><div class="form-group"><input type="number" name="quantity" id="quantity" size="6" class="form-control"
 						maxlength="5" /> <form:errors path="quantity" cssClass="error" /></div></td>
 				<td><p id="error3"></p></td>
 
@@ -74,7 +74,7 @@
 			</tr>
 			<tr>
 				<td>Price *:</td>
-				<td><div class="form-group"><form:input path="price" id="price" class="form-control" size="8" maxlength="6" />
+				<td><div class="form-group"><input type="number" name="price" id="price" class="form-control" size="8" maxlength="6" />
 					<form:errors path="price" cssClass="error" /></div></td>
 				<td><p id="error4"></p></td>
 			</tr>

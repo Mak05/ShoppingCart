@@ -65,14 +65,14 @@
 			</tr>
 			<tr>
 				<td>Quantity *:</td>
-				<td><div class="form-group"><form:input path="quantity" id="quantity" class="form-control"
+				<td><div class="form-group"><input type="number" name="quantity" id="quantity" class="form-control"
 						value="${product.quantity}" size="6" maxlength="5" /> <form:errors
 						path="quantity" cssClass="error" /></div></td>
 						<td><p id="error3"></p></td>
 			</tr>
 			<tr>
 				<td>Price *:</td>
-				<td><div class="form-group"><form:input path="price" id="price" size="8" class="form-control"
+				<td><div class="form-group"><input type="number" name="price" id="price" size="8" class="form-control"
 						value="${product.price}" maxlength="6" /> <form:errors
 						path="price" cssClass="error" /></div></td>
 						<td><p id="error4"></p></td>

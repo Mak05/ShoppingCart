@@ -127,6 +127,9 @@ body {
 					<td align="left"><input type="reset" value="Reset" class="btn btn-primary"/></td>
 				</tr>
 			</table>
+			<center>
+		<a href="/login" style="display: block">Back to Login</a>
+	</center>
 		</form:form>
 	</div>
 </body>

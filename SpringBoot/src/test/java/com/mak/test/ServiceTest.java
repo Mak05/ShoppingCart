@@ -24,7 +24,7 @@ import com.mak.service.ProductServiceImpl;
 public class ServiceTest {
 
 	@Autowired
-	ProductServiceImpl service;
+	ProductServiceImpl productService;
 	private Product product;
 
 	@Before
@@ -33,13 +33,13 @@ public class ServiceTest {
 	}
 
 	@Test
-	public void testGet() {
+	public void testProduct() {
 		product.setName("tiger");
 		product.setDescription("tiger");
 		product.setQuantity(10);
 		product.setPrice(100.00);
-		service.addProduct(product);
-		List<Product> productList = service.listProducts();
+		productService.addProduct(product);
+		List<Product> productList = productService.listProducts();
 		for (Product prod : productList) {
 			assertEquals("tiger", prod.getName());
 		}

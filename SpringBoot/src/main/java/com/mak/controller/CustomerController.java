@@ -1,6 +1,7 @@
 package com.mak.controller;
 
 import java.security.Principal;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.mak.exception.RecordNotFoundException;
 import com.mak.model.Product;
 import com.mak.model.Search;
 import com.mak.service.ProductServiceIntf;
@@ -41,6 +43,8 @@ public class CustomerController {
 	/**
 	 * @param principal
 	 * @param res
+	 * If Admin logs in then redirect page to shop Controller 
+	 * If User logs in then redirect page to Home Controller
 	 */
 	@RequestMapping("/admin")
 	public void admin(Principal principal, HttpServletResponse res) {
@@ -60,10 +64,21 @@ public class CustomerController {
 	/**
 	 * @param map
 	 * @return
+	 * This controller fetch all the data from product table and put it into home.jsp Page
 	 */
 	@RequestMapping(value = "/home")
-	public ModelAndView homePage(Map<String, Object> map) {
-		map.put("productList", productService.listProducts());
+	public ModelAndView homePage(Map<String, Object> map, Model model) {
+		logger.info("HomePage Controller");
+		try {
+			List<Product> productList = productService.listProducts();
+			if (productList.size() == 0) {
+				throw new RecordNotFoundException();
+			}
+			map.put("productList", productList);
+		} catch (RecordNotFoundException e) {
+			model.addAttribute("message", e.getMessage());
+			System.out.println("The message is " + e.getMessage());
+		}
 		return new ModelAndView("home");
 	}
 
@@ -72,36 +87,77 @@ public class CustomerController {
 	 * @param model
 	 * @param map
 	 * @return
+	 * This controller used by user to fetch all the data from product table with search box if we search a string then 
+	 * it searches the table and put the list of objects into home.jsp Page
 	 */
 	@RequestMapping(value = "/products")
 	public ModelAndView products(@ModelAttribute("Search") Search search, Model model, Map<String, Object> map) {
 		logger.info("Search Controller");
-		map.put("productList", productService.searchProduct("%" + search.getSearchItem() + "%"));
+		try {
+			List<Product> productList = productService.searchProduct("%" + search.getSearchItem() + "%");
+			if (productList.size() == 0) {
+				throw new RecordNotFoundException(search.getSearchItem());
+			}
+			map.put("productList", productList);
+		} catch (RecordNotFoundException e) {
+			model.addAttribute("message", e.getMessage());
+			System.out.println("The message is " + e.getMessage());
+		}
+
 		return new ModelAndView("home");
+
 	}
 
 	/**
 	 * @param inventory
 	 * @param map
 	 * @return
+	 * This controller is used by the admin to display the form to add new product into the database
 	 */
 	@RequestMapping(value = "/shop")
-	public ModelAndView addInventory(@ModelAttribute("inventory") Product inventory, Map<String, Object> map) {
+	public ModelAndView addInventory(@ModelAttribute("inventory") Product inventory, Map<String, Object> map,
+			Model model) {
 		logger.info("Shop Controller");
-		map.put("productList", productService.listProducts());
+
+		try {
+			List<Product> productList = productService.listProducts();
+			if (productList.size() == 0) {
+				throw new RecordNotFoundException();
+			}
+			map.put("productList", productList);
+		} catch (RecordNotFoundException e) {
+			model.addAttribute("message", e.getMessage());
+			System.out.println("The message is " + e.getMessage());
+		}
 		return new ModelAndView("addInventory");
+
 	}
 
 	/**
 	 * @param product
 	 * @param request
 	 * @return
+	 * This controller is used by the admin to display the edit form to update existing product into the database
 	 */
 	@RequestMapping(value = "/product")
-	public ModelAndView updateProduct(@ModelAttribute("product") Product product, HttpServletRequest request) {
+	public ModelAndView updateProduct(@ModelAttribute("product") Product product, HttpServletRequest request,
+			Model model) {
 		logger.info("Update Product");
-		int id = Integer.parseInt(request.getParameter("id"));
-		product = productService.getById(id);
+
+		try {
+
+			int id = Integer.parseInt(request.getParameter("id"));
+			product = productService.getById(id);
+
+			if (product == null) {
+
+				throw new RecordNotFoundException(id);
+			}
+		} catch (RecordNotFoundException e) {
+
+			return new ModelAndView("edit").addObject("message", e.getMessage());
+		}
+
 		return new ModelAndView("edit", "product", product);
 	}
 
@@ -110,28 +166,48 @@ public class CustomerController {
 	 * @param map
 	 * @param theBindingResult
 	 * @return
+	 * This controller is used by the admin to display to add new product into the database and list all the products
 	 */
 	@RequestMapping(value = "/product", method = RequestMethod.POST)
 	public ModelAndView SavePage(@Valid @ModelAttribute("inventory") Product inventory, Map<String, Object> map,
-			BindingResult theBindingResult) {
+			BindingResult theBindingResult, Model model) {
 		logger.info("Inserting the Product Details");
-		productService.addProduct(inventory);
-		map.put("productList", productService.listProducts());
-		return new ModelAndView("addInventory").addObject("message", "Product details are successfully added");
+
+		List<Product> productList;
+		if (theBindingResult.hasErrors()) {
+			productList = productService.listProducts();
+			map.put("productList", productService.listProducts());
+			return new ModelAndView("addInventory").addObject("message", "Please fill the mandatory fields");
+		} else {
+			logger.info("Inserting the Product Details");
+			try {
+				productService.addProduct(inventory);
+			} catch (Exception e) {
+				model.addAttribute("message", "The record is not successfully updated. Kindly try again !");
+			}
+
+			map.put("productList", productService.listProducts());
+			return new ModelAndView("addInventory").addObject("message", "Product details are successfully added");
+		}
 
 	}
 
 	/**
 	 * @param request
 	 * @param product
-	 * @param map
 	 * @return
+	 * This controller is used to display success page if update process is success 
 	 */
 	@RequestMapping(value = "/success", method = RequestMethod.POST)
 	public ModelAndView saveProduct(HttpServletRequest request, @ModelAttribute("product") Product product,
-			Map<String, Object> map) {
+			Model model) {
 		logger.info("Success Controller");
-		productService.addProduct(product);
+
+		try {
+			productService.addProduct(product);
+		} catch (Exception e) {
+			model.addAttribute("message", "The record is not successfully updated. Kindly try again !");
+		}
 		return new ModelAndView("editsuccess");
 	}
 
