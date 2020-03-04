@@ -139,10 +139,10 @@ public class CustomerController {
 	 * This controller is used by the admin to display the edit form to update existing product into the database
 	 */
 	@RequestMapping(value = "/product")
-	public ModelAndView updateProduct(@ModelAttribute("product") Product product, HttpServletRequest request,
+	public ModelAndView updateProduct(@ModelAttribute("product") Product products, HttpServletRequest request,
 			Model model) {
 		logger.info("Update Product");
-
+		Product product;
 		try {
 			String req=request.getParameter("id");
 			
