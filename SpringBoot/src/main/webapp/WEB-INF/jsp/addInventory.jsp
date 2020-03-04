@@ -83,8 +83,9 @@
 				<td><br /></td>
 				<td><input type="submit" class="btn btn-primary"
 					value="Save Product" onclick="return valid()" /></td>
+					<td><input type="reset" class="btn btn-primary"
+					value="reset" /></td>
 			</tr>
-
 		</table>
 	</div>
 </form:form>

@@ -77,7 +77,6 @@ public class CustomerController {
 			map.put("productList", productList);
 		} catch (RecordNotFoundException e) {
 			model.addAttribute("message", e.getMessage());
-			System.out.println("The message is " + e.getMessage());
 		}
 		return new ModelAndView("home");
 	}
@@ -101,7 +100,7 @@ public class CustomerController {
 			map.put("productList", productList);
 		} catch (RecordNotFoundException e) {
 			model.addAttribute("message", e.getMessage());
-			System.out.println("The message is " + e.getMessage());
+			
 		}
 
 		return new ModelAndView("home");
@@ -121,13 +120,13 @@ public class CustomerController {
 
 		try {
 			List<Product> productList = productService.listProducts();
-			if (productList.size() == 0) {
+			if (productList == null) {
 				throw new RecordNotFoundException();
 			}
 			map.put("productList", productList);
 		} catch (RecordNotFoundException e) {
-			model.addAttribute("message", e.getMessage());
-			System.out.println("The message is " + e.getMessage());
+			return new ModelAndView("addInventory").addObject("message", e.getMessage());
+			
 		}
 		return new ModelAndView("addInventory");
 
@@ -145,8 +144,9 @@ public class CustomerController {
 		logger.info("Update Product");
 
 		try {
-
-			int id = Integer.parseInt(request.getParameter("id"));
+			String req=request.getParameter("id");
+			
+			int id = Integer.parseInt(req);
 			product = productService.getById(id);
 
 			if (product == null) {
@@ -173,9 +173,7 @@ public class CustomerController {
 			BindingResult theBindingResult, Model model) {
 		logger.info("Inserting the Product Details");
 
-		List<Product> productList;
 		if (theBindingResult.hasErrors()) {
-			productList = productService.listProducts();
 			map.put("productList", productService.listProducts());
 			return new ModelAndView("addInventory").addObject("message", "Please fill the mandatory fields");
 		} else {

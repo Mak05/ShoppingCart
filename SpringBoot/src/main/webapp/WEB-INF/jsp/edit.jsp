@@ -18,7 +18,7 @@
 }
 </style>
 <script>
-	function valid() {
+		function valid() {
 		if (document.getElementById("name").value == "") {
 			document.getElementById("error1").innerHTML = "<center>name required</center>";
 			return false;
@@ -33,7 +33,6 @@
 		} else {
 
 			document.getElementById("error3").innerHTML = "";
-
 		}
 		if (document.getElementById("price").value == "") {
 			document.getElementById("error4").innerHTML = "<center>price required</center>";
@@ -41,7 +40,6 @@
 		} else {
 			return true;
 		}
-
 	}
 </script>
 <form:form method="POST" action="success" modelAttribute="product">
@@ -81,6 +79,8 @@
 				<td><br /></td>
 				<td><input type="submit" class="btn btn-primary"
 					value="Update Product" onclick="return valid()" /></td>
+				<td><input type="reset" class="btn btn-primary"
+					value="reset" /></td>
 			</tr>
 		</table>
 
